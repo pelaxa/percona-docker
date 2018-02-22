@@ -1,10 +1,14 @@
-version: '2'
+version: '3.1'
 
 services:
         percona-xtradb-cluster:
-          image: perconalab/percona-xtradb-cluster:latest
+          image: pelaxa/percona-xtradb-cluster:latest
           environment:
-            MYSQL_ROOT_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_pw
+            XTRABACKUP_PASSWORD_FILE: /run/secrets/mysql_backup_pw
+            MYSQL_DATABASE: testdb
+            MYSQL_USER: testdb_user
+            MYSQL_PASSWORD_FILE: /run/secrets/mysql_db_pw
             DISCOVERY_SERVICE: 10.20.2.4:2379
             CLUSTER_NAME: Theistareykjarbunga 
           networks:
@@ -17,8 +21,20 @@ services:
             # bind mount my local my.cnf
             # - $PWD/my.cnf:/etc/my.cnf
           #command:
+          secrets:
+            - mysql_root_pw
+            - mysql_backup_pw
+            - mysql_db_pw
 
 
 networks:
   Theistareykjarbunga_net:
     driver: overlay
+
+secrets:
+  mysql_root_pw:
+    file: ./mysql_root_pw.txt
+  mysql_backup_pw:
+    file: ./mysql_backup_pw.txt
+  mysql_db_pw:
+    file: ./mysql_db_pw.txt
